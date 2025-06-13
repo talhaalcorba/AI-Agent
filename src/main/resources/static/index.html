@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Tic-Tac-Toe</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+        #board {
+            display: grid;
+            grid-template-columns: repeat(3, 100px);
+            grid-gap: 5px;
+            width: 310px;
+            margin: 0 auto;
+        }
+        .cell {
+            width: 100px;
+            height: 100px;
+            border: 1px solid #333;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            cursor: pointer;
+        }
+        .x { color: yellow; }
+        .o { color: navy; }
+    </style>
+</head>
+<body>
+<h1>Tic-Tac-Toe</h1>
+<div id="message"></div>
+<div id="board"></div>
+<script>
+const boardDiv = document.getElementById('board');
+const messageDiv = document.getElementById('message');
+
+function renderBoard(board) {
+    boardDiv.innerHTML = '';
+    board.forEach((cell, idx) => {
+        const d = document.createElement('div');
+        d.className = 'cell';
+        d.dataset.pos = idx + 1;
+        if (cell === 'X') d.innerHTML = '<span class="x">X</span>';
+        if (cell === 'O') d.innerHTML = '<span class="o">O</span>';
+        d.addEventListener('click', () => move(d.dataset.pos));
+        boardDiv.appendChild(d);
+    });
+}
+
+function refresh() {
+    fetch('/game')
+        .then(r => r.json())
+        .then(state => {
+            renderBoard(state.board);
+            messageDiv.textContent = state.message;
+        });
+}
+
+function move(pos) {
+    fetch('/game/move?position=' + pos, {method: 'POST'})
+        .then(r => r.json())
+        .then(state => {
+            renderBoard(state.board);
+            messageDiv.textContent = state.message;
+        });
+}
+
+refresh();
+</script>
+</body>
+</html>
